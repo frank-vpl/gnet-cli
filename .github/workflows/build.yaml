@@ -1,0 +1,163 @@
+name: Build and Test
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        go-version: [1.27.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Print Go version
+      run: go version
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Verify dependencies
+      run: go mod verify
+
+    - name: Run tests
+      run: go test ./...
+
+  build:
+    name: Build for ${{ matrix.target.os }}/${{ matrix.target.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          # Linux
+          - { os: linux, arch: amd64, name: linux-x64, binary: gnet-linux-x64, final_binary: gnet }
+          - { os: linux, arch: 386, name: linux-x86, binary: gnet-linux-x86, final_binary: gnet }
+          # Windows
+          - { os: windows, arch: amd64, name: windows-x64, binary: gnet-windows-x64.exe, final_binary: gnet.exe }
+          - { os: windows, arch: 386, name: windows-x86, binary: gnet-windows-x86.exe, final_binary: gnet.exe }
+          # macOS
+          - { os: darwin, arch: amd64, name: macos-x64, binary: gnet-macos-x64, final_binary: gnet }
+          - { os: darwin, arch: arm64, name: macos-arm64, binary: gnet-macos-arm64, final_binary: gnet }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.27.x
+
+    - name: Set up environment
+      run: |
+        echo "GOOS=${{ matrix.target.os }}" >> $GITHUB_ENV
+        echo "GOARCH=${{ matrix.target.arch }}" >> $GITHUB_ENV
+
+    - name: Tidy and verify modules
+      run: |
+        go mod tidy
+        go mod verify
+
+    - name: Build binary
+      run: |
+        echo "Building for ${{ matrix.target.name }} (${{ matrix.target.os }}/${{ matrix.target.arch }})"
+        CGO_ENABLED=0 GOOS=${{ matrix.target.os }} GOARCH=${{ matrix.target.arch }} go build -o ${{ matrix.target.binary }} .
+        ls -la ${{ matrix.target.binary }}
+
+    - name: Rename binary and create ZIP archive
+      run: |
+        mv ${{ matrix.target.binary }} ${{ matrix.target.final_binary }}
+        zip gnet-${{ matrix.target.name }}.zip ${{ matrix.target.final_binary }} README.md LICENSE
+        ls -la gnet-${{ matrix.target.name }}.zip
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnet-${{ matrix.target.name }}
+        path: |
+          gnet-${{ matrix.target.name }}.zip
+          ${{ matrix.target.final_binary }}
+
+  release:
+    name: Create Release
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set tag name
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "TAG_NAME=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+        else
+          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        fi
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: downloaded-artifacts
+
+    - name: Prepare release assets
+      run: |
+        mkdir -p release-assets
+        find downloaded-artifacts -name "gnet-*.zip" -type f -exec mv {} release-assets/ \;
+        echo "Release assets prepared:"
+        ls -la release-assets/
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        name: GNet CLI ${{ env.TAG_NAME }}
+        body: |
+          ## 🚀 GNet CLI Release
+
+          ### 💻 Installation
+
+          #### From Binary (Recommended)
+          Download the appropriate binary for your platform from the table below and run it directly.
+
+          #### From Source
+          ```bash
+          git clone https://github.com/frank-vpl/gnet-cli.git
+          cd gnet-cli
+          go build -o gnet .
+          ./gnet  # or .\gnet.exe on Windows
+          ```
+
+          ### ⬇️ Download
+
+          | Platform | Architecture | Download |
+          |----------|-------------|----------|
+          | Windows | x64 | <a href="https://github.com/frank-vpl/gnet-cli/releases/download/${{ env.TAG_NAME }}/gnet-windows-x64.zip"><img src="https://img.shields.io/badge/Windows-x64-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x64"></a> |
+          | Windows | x86 | <a href="https://github.com/frank-vpl/gnet-cli/releases/download/${{ env.TAG_NAME }}/gnet-windows-x86.zip"><img src="https://img.shields.io/badge/Windows-x86-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows x86"></a> |
+          | Linux | x64 | <a href="https://github.com/frank-vpl/gnet-cli/releases/download/${{ env.TAG_NAME }}/gnet-linux-x64.zip"><img src="https://img.shields.io/badge/Linux-x64-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x64"></a> |
+          | Linux | x86 | <a href="https://github.com/frank-vpl/gnet-cli/releases/download/${{ env.TAG_NAME }}/gnet-linux-x86.zip"><img src="https://img.shields.io/badge/Linux-x86-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="Linux x86"></a> |
+          | macOS | x64 | <a href="https://github.com/frank-vpl/gnet-cli/releases/download/${{ env.TAG_NAME }}/gnet-macos-x64.zip"><img src="https://img.shields.io/badge/macOS-x64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS x64"></a> |
+          | macOS | ARM64 | <a href="https://github.com/frank-vpl/gnet-cli/releases/download/${{ env.TAG_NAME }}/gnet-macos-arm64.zip"><img src="https://img.shields.io/badge/macOS-ARM64-000000?style=for-the-badge&logo=apple&logoColor=white" alt="macOS ARM64"></a> |
+        files: release-assets/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
