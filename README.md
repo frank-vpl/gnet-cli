@@ -1,5 +1,7 @@
 <div align="center">
 
+English | [فارسی](README_FA.md)
+
 # 🌐 GNet CLI
 
 **Share your VPN over HTTP/SOCKS5 to any device on your network.**
@@ -66,12 +68,12 @@ Grab the latest pre-built binary for your platform — no Go installation requir
 
 | Platform | Architecture | Download |
 |----------|-------------|----------|
-| 🪟 Windows | x64 | [![Download](https://img.shields.io/badge/gnet-windows--x64.zip-0078D6?logo=windows&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-windows-x64.zip) |
-| 🪟 Windows | x86 | [![Download](https://img.shields.io/badge/gnet-windows--x86.zip-0078D6?logo=windows&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-windows-x86.zip) |
-| 🐧 Linux | x64 | [![Download](https://img.shields.io/badge/gnet-linux--x64.zip-FCC624?logo=linux&logoColor=black&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-linux-x64.zip) |
-| 🐧 Linux | x86 | [![Download](https://img.shields.io/badge/gnet-linux--x86.zip-FCC624?logo=linux&logoColor=black&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-linux-x86.zip) |
-| 🍎 macOS | x64 (Intel) | [![Download](https://img.shields.io/badge/gnet-macos--x64.zip-000000?logo=apple&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-macos-x64.zip) |
-| 🍎 macOS | ARM64 (Apple Silicon) | [![Download](https://img.shields.io/badge/gnet-macos--arm64.zip-000000?logo=apple&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-macos-arm64.zip) |
+| 🪟 Windows | x64 | [![Download](https://img.shields.io/badge/Windows-x64-0078D6?logo=windows&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-windows-x64.zip) |
+| 🪟 Windows | x86 | [![Download](https://img.shields.io/badge/Windows-x86-0078D6?logo=windows&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-windows-x86.zip) |
+| 🐧 Linux | x64 | [![Download](https://img.shields.io/badge/Linux-x64-FCC624?logo=linux&logoColor=black&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-linux-x64.zip) |
+| 🐧 Linux | x86 | [![Download](https://img.shields.io/badge/Linux-x86-FCC624?logo=linux&logoColor=black&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-linux-x86.zip) |
+| 🍎 macOS | x64 (Intel) | [![Download](https://img.shields.io/badge/macOS-x64-000000?logo=apple&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-macos-x64.zip) |
+| 🍎 macOS | ARM64 (Apple Silicon) | [![Download](https://img.shields.io/badge/macOS-ARM64-000000?logo=apple&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-macos-arm64.zip) |
 
 > 💡 Each ZIP contains the `gnet` binary (or `gnet.exe`), `README.md`, and `LICENSE`.
 > Extract it, add the folder to your `PATH`, and run `gnet`.
@@ -80,7 +82,88 @@ All releases: [github.com/frank-vpl/gnet-cli/releases](https://github.com/frank-
 
 ---
 
-## 🚀 Quick Start
+## 🔧 Add to PATH (Optional)
+
+After downloading or building the `gnet` binary, add its folder to your system `PATH` so you can run `gnet` from any terminal window.
+
+### 🪟 Windows
+
+**Option A — PowerShell (current user, recommended):**
+
+```powershell
+# Replace C:\Tools\gnet with the folder containing gnet.exe
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Tools\gnet", "User")
+```
+
+Close and reopen your terminal, then verify:
+
+```powershell
+gnet --help
+```
+
+**Option B — GUI (System Properties):**
+
+1. Press `Win + R`, type `sysdm.cpl`, and hit Enter.
+2. Go to **Advanced** → **Environment Variables**.
+3. Under **User variables**, select `Path` → **Edit** → **New**.
+4. Paste the folder path that contains `gnet.exe` (e.g. `C:\Tools\gnet`).
+5. Click **OK** on all windows and restart your terminal.
+
+**Option C — Windows Settings app:**
+
+1. Open **Start**, type `environment variables`, and select **Edit the system environment variables** (or **Edit environment variables for your account**).
+2. In the window that opens, click **Environment Variables…**.
+3. Under **User variables**, select `Path` → **Edit** → **New**.
+4. Paste the folder path that contains `gnet.exe` (e.g. `C:\Tools\gnet`).
+5. Click **OK** on all windows and restart your terminal.
+
+> Tip: You can also reach this screen from **Settings → System → About → Advanced system settings**.
+
+### 🐧 Linux
+
+Move the binary to a directory already in your `PATH`:
+
+```bash
+sudo mv gnet /usr/local/bin/gnet
+sudo chmod +x /usr/local/bin/gnet
+```
+
+Or add its folder to `PATH` permanently:
+
+```bash
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+# or ~/.zshrc if you use Zsh
+source ~/.bashrc
+```
+
+Verify:
+
+```bash
+gnet --help
+```
+
+### 🍎 macOS
+
+```bash
+sudo mv gnet /usr/local/bin/gnet
+sudo chmod +x /usr/local/bin/gnet
+```
+
+If you downloaded it via Safari and macOS blocks it, allow it once:
+
+```bash
+xattr -d com.apple.quarantine /usr/local/bin/gnet
+```
+
+Verify:
+
+```bash
+gnet --help
+```
+
+---
+
+## �� Quick Start
 
 Launch the interactive wizard with no arguments:
 
