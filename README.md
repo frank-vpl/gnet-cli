@@ -10,8 +10,10 @@ Turn your machine into a lightweight proxy server so phones, tablets, smart TVs,
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-7B2CBF?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-3DDC84?style=for-the-badge)
 ![Version](https://img.shields.io/badge/version-v1.0-1F6FEB?style=for-the-badge)
+[![Build and Test](https://img.shields.io/github/actions/workflow/status/frank-vpl/gnet-cli/build.yaml?label=Build%20%26%20Test&logo=githubactions&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/actions/workflows/build.yaml)
+[![Latest Release](https://img.shields.io/github/v/release/frank-vpl/gnet-cli?display_name=release&label=Latest%20Release&logo=github&style=for-the-badge&color=1F6FEB)](https://github.com/frank-vpl/gnet-cli/releases/latest)
 
-[🚀 Quick Start](#-quick-start) · [📚 Commands](#-commands) · [🔌 Sharing Methods](#-sharing-methods) · [⚙️ Configuration](#️-configuration)
+[⬇️ Download](#️-download) · [🚀 Quick Start](#-quick-start) · [📚 Commands](#-commands) · [🔌 Sharing Methods](#-sharing-methods)
 
 </div>
 
@@ -45,6 +47,26 @@ go build -o gnet .
 ### Requirements
 
 - [Go](https://go.dev/) 1.27 or later
+
+---
+
+## ⬇️ Download
+
+Grab the latest pre-built binary for your platform — no Go installation required.
+
+| Platform | Architecture | Download |
+|----------|-------------|----------|
+| 🪟 Windows | x64 | [![Download](https://img.shields.io/badge/gnet-windows--x64.zip-0078D6?logo=windows&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-windows-x64.zip) |
+| 🪟 Windows | x86 | [![Download](https://img.shields.io/badge/gnet-windows--x86.zip-0078D6?logo=windows&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-windows-x86.zip) |
+| 🐧 Linux | x64 | [![Download](https://img.shields.io/badge/gnet-linux--x64.zip-FCC624?logo=linux&logoColor=black&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-linux-x64.zip) |
+| 🐧 Linux | x86 | [![Download](https://img.shields.io/badge/gnet-linux--x86.zip-FCC624?logo=linux&logoColor=black&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-linux-x86.zip) |
+| 🍎 macOS | x64 (Intel) | [![Download](https://img.shields.io/badge/gnet-macos--x64.zip-000000?logo=apple&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-macos-x64.zip) |
+| 🍎 macOS | ARM64 (Apple Silicon) | [![Download](https://img.shields.io/badge/gnet-macos--arm64.zip-000000?logo=apple&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/releases/latest/download/gnet-macos-arm64.zip) |
+
+> 💡 Each ZIP contains the `gnet` binary (or `gnet.exe`), `README.md`, and `LICENSE`.
+> Extract it, add the folder to your `PATH`, and run `gnet`.
+
+All releases: [github.com/frank-vpl/gnet-cli/releases](https://github.com/frank-vpl/gnet-cli/releases)
 
 ---
 
@@ -200,7 +222,32 @@ go build -o gnet .
 
 ---
 
-## 📄 License
+## � CI/CD
+
+The project uses **GitHub Actions** for automated testing, cross-compilation, and releases.
+
+### Workflow: [Build and Test](.github/workflows/build.yaml)
+
+| Job | Trigger | Description |
+|-----|---------|-------------|
+| `test` | push / PR | Runs `go test ./...` on Ubuntu, Windows, and macOS |
+| `build` | push / PR / tag | Cross-compiles 6 binaries (Linux/Windows/macOS × x86/x64/arm64) and uploads ZIPs |
+| `release` | tag `v*` or manual | Creates a GitHub Release with all binaries + a download table |
+
+### Automated release process
+
+1. Push a version tag, e.g. `git tag v1.0.0 && git push origin v1.0.0` (or run the workflow manually from the **Actions** tab).
+2. The `build` job compiles `gnet` for all platforms and packages each binary with `README.md` + `LICENSE` into a ZIP.
+3. The `release` job publishes a GitHub Release and attaches every ZIP as a downloadable asset.
+
+### Status
+
+- **Build & Test:** [![Build and Test](https://img.shields.io/github/actions/workflow/status/frank-vpl/gnet-cli/build.yaml?logo=githubactions&logoColor=white&style=flat-square)](https://github.com/frank-vpl/gnet-cli/actions/workflows/build.yaml)
+- **Latest Release:** [![Latest Release](https://img.shields.io/github/v/release/frank-vpl/gnet-cli?display_name=release&logo=github&style=flat-square)](https://github.com/frank-vpl/gnet-cli/releases/latest)
+
+---
+
+## � License
 
 Released under the MIT License. See [LICENSE](LICENSE) for details.
 
@@ -208,6 +255,6 @@ Released under the MIT License. See [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-Built with 🩷 using [Cobra](https://github.com/spf13/cobra), [Bubble Tea](https://github.com/charmbracelet/bubbletea) & [Lip Gloss](https://github.com/charmbracelet/lipgloss)
+Built with 🩷 by **Hossein Pira** using [Cobra](https://github.com/spf13/cobra), [Bubble Tea](https://github.com/charmbracelet/bubbletea) & [Lip Gloss](https://github.com/charmbracelet/lipgloss)
 
 </div>
