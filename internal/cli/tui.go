@@ -175,11 +175,13 @@ func (m *tuiModel) updateProxyChoice(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.step = stepHTTPPort
 				m.input.SetValue(strconv.Itoa(m.cfg.HTTPPort))
 				m.input.Placeholder = "8080"
+				m.input.Focus()
 				return m, textinput.Blink
 			}
 			m.step = stepSocksPort
 			m.input.SetValue(strconv.Itoa(m.cfg.Socks5Port))
 			m.input.Placeholder = "1080"
+			m.input.Focus()
 			return m, textinput.Blink
 		}
 	}
@@ -202,6 +204,7 @@ func (m *tuiModel) updatePort(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.step = stepSocksPort
 					m.input.SetValue(strconv.Itoa(m.cfg.Socks5Port))
 					m.input.Placeholder = "1080"
+					m.input.Focus()
 					return m, textinput.Blink
 				}
 				m.step = stepBind

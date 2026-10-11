@@ -19,6 +19,16 @@ Turn your machine into a lightweight proxy server so phones, tablets, smart TVs,
 
 ---
 
+## 🖼️ Screenshot
+
+<p align="center">
+  <img src="image.png" alt="GNet CLI Wizard" width="700" />
+</p>
+
+*The interactive setup wizard — choose proxy type, ports, bind address, and sharing method in seconds.*
+
+---
+
 ## ✨ Features
 
 - 🔁 **HTTP & SOCKS5 Proxy** — Run one or both simultaneously with custom ports.
