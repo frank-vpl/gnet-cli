@@ -11,7 +11,7 @@ Turn your machine into a lightweight proxy server so phones, tablets, smart TVs,
 ![Go](https://img.shields.io/badge/Go-1.27+-00ADD8?logo=go&logoColor=white&style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-7B2CBF?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-3DDC84?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-v1.0-1F6FEB?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v1.0.1-1F6FEB?style=for-the-badge)
 [![Build and Test](https://img.shields.io/github/actions/workflow/status/frank-vpl/gnet-cli/build.yaml?label=Build%20%26%20Test&logo=githubactions&logoColor=white&style=for-the-badge)](https://github.com/frank-vpl/gnet-cli/actions/workflows/build.yaml)
 [![Latest Release](https://img.shields.io/github/v/release/frank-vpl/gnet-cli?display_name=release&label=Latest%20Release&logo=github&style=for-the-badge&color=1F6FEB)](https://github.com/frank-vpl/gnet-cli/releases/latest)
 
