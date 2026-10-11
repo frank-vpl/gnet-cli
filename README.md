@@ -33,7 +33,7 @@ Turn your machine into a lightweight proxy server so phones, tablets, smart TVs,
 
 - 🔁 **HTTP & SOCKS5 Proxy** — Run one or both simultaneously with custom ports.
 - 🧙 **Interactive Wizard** — A polished TUI walks you through setup step by step.
-- 🛡️ **Firewall Automation** — Auto-creates the Windows Firewall rule; gives hints for Linux/macOS.
+- 🛡️ **Firewall Automation** — Auto-creates firewall rules on **Windows, Linux (ufw/firewalld/nftables/iptables), and macOS** (or gives copy-paste commands).
 - 📡 **Auto IP Detection** — Shows every reachable address so devices can connect.
 - 🔌 **5 Sharing Methods** — LAN, Wi-Fi, Hotspot (AP), USB Tethering, Router Port Forward.
 - 💾 **Persistent Config** — Saves your settings to `~/.gnet-cli/config.json`.
@@ -161,6 +161,138 @@ gnet serve --debug --log-file gnet.log
 | 🏠 **Router / Port Forward** | ❌ | Reach devices across networks |
 
 Run `gnet methods` to see OS-specific setup steps for each method.
+
+---
+
+## 🔥 Firewall Commands
+
+GNet CLI tries to **auto-open** the firewall for its ports (default `8080` HTTP, `1080` SOCKS5). If auto-setup needs root/admin, it prints the exact command to run. Below is a complete reference for every major OS & firewall in the world.
+
+> Replace `<PORT>` with your configured port (e.g. `8080` or `1080`). Use commas for multiple ports, e.g. `8080,1080`.
+
+### 🪟 Windows
+
+```powershell
+# Add inbound rule (run as Administrator)
+netsh advfirewall firewall add rule name="GNet CLI" dir=in action=allow protocol=TCP localport=8080,1080 profile=any
+
+# Verify the rule exists
+netsh advfirewall firewall show rule name="GNet CLI"
+
+# Delete the rule
+netsh advfirewall firewall delete rule name="GNet CLI"
+```
+
+### 🐧 Linux
+
+#### 1. ufw (Ubuntu, Debian, Mint, Pop!_OS, Kali)
+
+```bash
+sudo ufw allow 8080/tcp
+sudo ufw allow 1080/tcp
+# Or in one line:
+sudo ufw allow 8080,1080/tcp
+
+# Check status
+sudo ufw status verbose
+
+# Remove the rule
+sudo ufw delete allow 8080/tcp
+sudo ufw delete allow 1080/tcp
+```
+
+#### 2. firewalld (RHEL, CentOS, Fedora, Rocky, Alma, openSUSE)
+
+```bash
+# Permanent + reload
+sudo firewall-cmd --permanent --add-port=8080/tcp --add-port=1080/tcp
+sudo firewall-cmd --reload
+
+# Check
+sudo firewall-cmd --list-ports
+
+# Remove
+sudo firewall-cmd --permanent --remove-port=8080/tcp --remove-port=1080/tcp
+sudo firewall-cmd --reload
+```
+
+#### 3. nftables (Arch, Alpine, modern Debian, Fedora)
+
+```bash
+# Create a dedicated table + chain + rule
+sudo nft add table inet gnet
+sudo nft add chain inet gnet input '{ type filter hook input priority 0 ; }'
+sudo nft add rule inet gnet input tcp dport {8080,1080} accept
+
+# List rules
+sudo nft list ruleset
+
+# Remove (delete the whole table)
+sudo nft delete table inet gnet
+```
+
+#### 4. iptables (legacy Linux)
+
+```bash
+# Allow the ports
+sudo iptables -A INPUT -p tcp -m multiport --dports 8080,1080 -j ACCEPT
+
+# Save the rule (persistent)
+sudo netfilter-persistent save          # Debian/Ubuntu
+sudo service iptables save              # RHEL/CentOS 6
+
+# List rules
+sudo iptables -L INPUT -n --line-numbers
+
+# Remove the rule (by line number)
+sudo iptables -D INPUT 1
+```
+
+#### 5. OpenWrt (LuCI / UCI)
+
+```bash
+# Allow ports on the WAN zone
+uci add firewall rule
+uci set firewall.@rule[-1].name='GNet CLI'
+uci set firewall.@rule[-1].src='wan'
+uci set firewall.@rule[-1].dest_port='8080 1080'
+uci set firewall.@rule[-1].proto='tcp'
+uci set firewall.@rule[-1].target='ACCEPT'
+uci commit firewall
+/etc/init.d/firewall restart
+```
+
+### 🍎 macOS
+
+```bash
+# Enable the firewall
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+
+# Allow the GNet binary
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /path/to/gnet
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp /path/to/gnet
+
+# View firewall state
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --listapps
+
+# Remove the app rule
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --remove /path/to/gnet
+```
+
+**Or via the GUI:** System Settings → Network → Firewall → Options → **+** → select `gnet` → Allow incoming connections.
+
+### 🧹 BSD / pfSense / FreeBSD (pf)
+
+```pf
+# /etc/pf.conf (FreeBSD) or via pfSense GUI:
+pass in on any proto tcp from any to any port { 8080, 1080 }
+```
+
+```bash
+# Reload pf
+sudo pfctl -f /etc/pf.conf && sudo pfctl -e
+```
 
 ---
 
